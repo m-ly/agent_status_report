@@ -1,17 +1,25 @@
 import pandas as pd
 import xlrd
 import os
+import sys
+import openpyxl
 
+
+# given a directory as an input
+    #For each xls file in the the directory, create a frame, and push the frame to an array
+    # transform each element in the array to desired formatting - rename column
+    # merge the frames into a single frame
+    # write the frame to excel
+
+directory = os.getcwd() + '/' + sys.argv[1]
 POSITIONS = ['channel_1', 'channel_2', 'fire', 'phones', 'ch1', 'ch2']
-fire_input = "2023-09-24_0908-fire.xls"
-ch1_input =  "2023-09-24_0908-ch1.xls"
 
-def set_working_dataframe(filename):
+
+
+def set_working_file(filename):
   wb = xlrd.open_workbook(filename, logfile=open(os.devnull, 'w'))
   return pd.read_excel(wb)
 
-fire_data = set_working_dataframe(fire_input)
-ch1_data = set_working_dataframe(ch1_input)
 
 def set_position_name(filename, positions):
   for ele in positions:
@@ -50,8 +58,6 @@ def current_working_data(frame):
 
   return frame.iloc[rows_range, filters]
 
-filtered_data = current_working_data(fire_data)
-ch1_data = current_working_data(ch1_data)
 
 def agent_time_df(filename, frame):
   agents = {}
@@ -71,16 +77,38 @@ def format_time(number_string):
   return round((numbers[0] * 60 + numbers[1]) / 60, 2)
 
 
-fire_data = agent_time_df(fire_input,filtered_data)
-fire_data_2 = agent_time_df(fire_input,filtered_data)
-ch1_data = agent_time_df(ch1_input, ch1_data)
+def all_reports(directory):
+  xls_files = [];
+  for root_, dir_, files in os.walk(directory):
+    for file in files:
+      if file.endswith(".xls"):
+        xls_files.append(directory + '/' + file)
+  return xls_files
 
-frames = [fire_data, fire_data_2, ch1_data]
+def create_frame(file):
+      input_data = set_working_file(file)
+      filtered_data = current_working_data(input_data)
+      return  agent_time_df(file,filtered_data)
 
-# df = pd.merge(filtered_data, ch1_data, on='Agents')
-df = pd.concat(frames, axis=1)
-df = df.groupby(df.columns, axis=1).sum()
-print(df)
 
-#filtered_data.to_csv("monthly_status_report.xlsx")
+def copy_excel_template(date):
+  wb = openpyxl.load_workbook('template.xlsx')
+  ws = wb.create_sheet('data')
+  for row in wb['sheet1'].rows:
+    ws.append(row)
+  wb.save(f"workbook_{date}_monthly_report.xlsx")
+
+def report_writer(directory):
+  reports = all_reports(directory)
+  frames = []
+
+  for file in reports:
+    frames.append(create_frame(file))
+
+  merged_frame = pd.concat(frames, axis=0)
+  result = merged_frame.groupby('Agents').sum()
+  result.reset_index(inplace=True)
+  result.to_excel('monthly_status_report.xlsx', index=False)
   
+
+report_writer(directory)
