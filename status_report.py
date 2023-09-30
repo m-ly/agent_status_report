@@ -11,10 +11,8 @@ import openpyxl
     # merge the frames into a single frame
     # write the frame to excel
 
-directory = os.getcwd() + '/' + sys.argv[1]
+directory = sys.argv[1]
 POSITIONS = ['channel_1', 'channel_2', 'fire', 'phones', 'ch1', 'ch2']
-
-
 
 def set_working_file(filename):
   wb = xlrd.open_workbook(filename, logfile=open(os.devnull, 'w'))
@@ -108,7 +106,7 @@ def report_writer(directory):
   merged_frame = pd.concat(frames, axis=0)
   result = merged_frame.groupby('Agents').sum()
   result.reset_index(inplace=True)
-  result.to_excel('monthly_status_report.xlsx', index=False)
+  result.to_excel(f"{directory}/monthly_status_report.xlsx", index=False)
   
 
 report_writer(directory)
