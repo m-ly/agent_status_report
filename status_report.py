@@ -16,7 +16,7 @@ import sys
 
 
 # example usage 
-# python3 statys_report.py /Users/matthewlyell/Downloads/100823_week_end
+# python3 status_report.py /Users/matthewlyell/Downloads/100823_week_end
 
 directory = sys.argv[1]
 # The file name must include one of these exact strings in the name 
@@ -104,6 +104,7 @@ def report_writer(directory):
   frames = []
 
   for file in reports:
+    print(file)
     frames.append(create_frame(file))
 
   # Concatenate all frame objects, grouping on the Agent key
@@ -125,6 +126,5 @@ def report_writer(directory):
 
 
   result.to_excel(f"{directory}/monthly_status_report.xlsx", index=False)
-  
 
 report_writer(directory)
