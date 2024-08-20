@@ -1,5 +1,6 @@
 import pandas as pd
 import xlrd
+import openpyxl
 import os
 
 
@@ -7,7 +8,6 @@ import os
 DIRECTORY = './uploads'
 
 def create_ready_report(directory):
-  print('In the ready function')
   def set_working_file(filename):
     wb = xlrd.open_workbook(filename, logfile=open(os.devnull, 'w'))
     data = pd.read_excel(wb)
@@ -77,14 +77,11 @@ def create_ready_report(directory):
   # Iterate over files in the directory
   for root_, dir_, files in os.walk(DIRECTORY):
       for file in files:
-        print(file)
         if file.endswith(".xls"):
           file_path = DIRECTORY + '/' + file
-          print(file_path)
           data = create_frame(file_path)
        
           concatenated_data = pd.concat([concatenated_data, data])
-          print('did not fail in iteration')
 
   # Group the concatenated data by the 'Agent' column
   grouped_data = concatenated_data.groupby('Agents').sum()
@@ -115,4 +112,7 @@ def create_ready_report(directory):
   #   wb.save(output_file)
 
   # Save the grouped data to a new Excel file
-  grouped_data.to_excel(DIRECTORY + "/ready_status_report.xlsx", index=True)
+  with pd.ExcelWriter(path = DIRECTORY + "/monthly_ready_report.xlsx") as writer:
+    grouped_data.to_excel(writer, index=False)
+
+ 

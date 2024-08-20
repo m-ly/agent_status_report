@@ -17,10 +17,8 @@ DIRECTORY = './uploads'
 POSITIONS = ['fire', 'phones', 'ch1','ch2', 'training']
 
 def create_status_report(directory):
-  print('in status function')
   
   def set_working_file(filename):
-    print(f"working file is: {filename}")
     wb = xlrd.open_workbook(filename, logfile=open(os.devnull, 'w'))
     data = pd.read_excel(wb)
     wb.release_resources()
@@ -85,7 +83,6 @@ def create_status_report(directory):
   def all_reports(directory):
     xls_files = [];
     for root_, dir_, files in os.walk(directory):
-      print('reports in file')
       for file in files:
         if file.endswith(".xls"):
           xls_files.append(directory + '/' + file)
@@ -105,7 +102,6 @@ def create_status_report(directory):
     frames = []
 
     for file in reports:
-      print(file)
       frames.append(create_frame(file))
 
     # Concatenate all frame objects, grouping on the Agent key
@@ -125,7 +121,8 @@ def create_status_report(directory):
           col_name = f"{result.columns[i - 1]} %"
           result.insert(i, col_name, round(result.iloc[:, i - 1] / result.iloc[:, -1], 2))
 
-
-    result.to_excel(f"{directory}/monthly_status_report.xlsx", index=False)
+    with pd.ExcelWriter(path = DIRECTORY + "/monthly_status_report.xlsx") as writer:
+      result.to_excel(writer, index=False)
+ 
 
   report_writer(DIRECTORY)
