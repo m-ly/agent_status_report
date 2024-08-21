@@ -49,11 +49,18 @@ def upload_file():
 
 @app.route('/download/<filename>', methods=['GET'])
 def download_file(filename):
+    uploads_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'uploads'))
+    print(uploads_path)
     try:
-        app_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'uploads'))
-        file_path = os.path.join(app_path, filename)
-
-        return send_file(file_path, as_attachment=True, mimetype= 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+      file_path = os.path.join(uploads_path, filename)
+      response = send_file(file_path, as_attachment=True, mimetype= 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     except Exception as e:
-        print(f'Error: {e}')
-        return jsonify({"status": 0})
+      print(f'Error: {e}')
+      response = jsonify({"status": 0})
+
+    for root, dirs, files in os.walk(uploads_path):
+       for file in files:
+         file_to_remove = os.path.join(root, file)
+         os.remove(file_to_remove)
+
+    return response
