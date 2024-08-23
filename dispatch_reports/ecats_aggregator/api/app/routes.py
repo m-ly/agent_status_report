@@ -32,11 +32,11 @@ def upload_file():
             
             
             if script == 'ready':
-              create_ready_report(DIRECTORY)
+              create_ready_report()
               report_filename = 'monthly_ready_report.xlsx'   
               download_url = f'/download/{report_filename}'
             else:
-              create_status_report(DIRECTORY)
+              create_status_report()
               report_filename = 'monthly_status_report.xlsx' 
               download_url = f'/download/{report_filename}'
           
@@ -64,3 +64,7 @@ def download_file(filename):
          os.remove(file_to_remove)
 
     return response
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
