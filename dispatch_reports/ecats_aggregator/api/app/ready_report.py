@@ -1,13 +1,12 @@
 import pandas as pd
 import xlrd
-import openpyxl
 import os
 
 
 
 DIRECTORY = './uploads'
 
-def create_ready_report(directory):
+def create_ready_report():
   def set_working_file(filename):
     wb = xlrd.open_workbook(filename, logfile=open(os.devnull, 'w'))
     data = pd.read_excel(wb)

@@ -16,7 +16,7 @@ DIRECTORY = './uploads'
 # The file name must include one of these exact strings in the name 
 POSITIONS = ['fire', 'phones', 'ch1','ch2', 'training']
 
-def create_status_report(directory):
+def create_status_report():
   
   def set_working_file(filename):
     wb = xlrd.open_workbook(filename, logfile=open(os.devnull, 'w'))
